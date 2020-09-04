@@ -2,6 +2,7 @@ package spannerbuilder
 
 type Builder struct {
 	table  string
+	sel    string
 	cols   []string
 	keys   []string
 	wheres []string

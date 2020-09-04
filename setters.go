@@ -1,17 +1,27 @@
 package spannerbuilder
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
 
-func (b *Builder) Select(s string) *Builder {
-	b.cols = strings.Split(s, ",")
+func (b *Builder) Select(s string, cols ...string) *Builder {
+	if len(cols) == 0 {
+		b.cols = strings.Split(s, ",")
+	} else {
+		b.sel = s
+		b.cols = cols
+	}
 	return b
 }
 
-func (b *Builder) Join(s string) *Builder {
-	b.joins = append(b.joins, s)
+func (b *Builder) Join(s string, joinType ...string) *Builder {
+	if len(joinType) == 0 {
+		b.joins = append(b.joins, fmt.Sprintf(" JOIN %s", s))
+	} else {
+		b.joins = append(b.joins, fmt.Sprintf(" %s JOIN %s", strings.Join(joinType, " "), s))
+	}
 	return b
 }
 
