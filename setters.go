@@ -31,20 +31,17 @@ func (b *Builder) Join(s string, joinType ...string) *Builder {
 }
 
 func (b *Builder) Where(s string, args ...interface{}) *Builder {
-	if len(args) == 1 {
-		if v, ok := args[0].(map[string]interface{}); ok {
-			b.args = v
-			b.wheres = append(b.wheres, s)
-			return b
-		}
-	}
-	xargs := len(b.args)
-	for i := 0; i < len(args); i++ {
-		k := "arg" + strconv.Itoa(i+xargs)
-		s = strings.Replace(s, "?", "@"+k, 1)
-		b.args[k] = args[i]
-	}
-	b.wheres = append(b.wheres, s)
+	b.updateArgs(s, args, &b.wheres)
+	return b
+}
+
+func (b *Builder) GroupBy(s string) *Builder {
+	b.group = s
+	return b
+}
+
+func (b *Builder) Having(s string, args ...interface{}) *Builder {
+	b.updateArgs(s, args, &b.having)
 	return b
 }
 
@@ -56,4 +53,23 @@ func (b *Builder) OrderBy(s string) *Builder {
 func (b *Builder) Limit(i int) *Builder {
 	b.limit = i
 	return b
+}
+
+func (b *Builder) updateArgs(s string, args []interface{}, target *[]string) {
+	if len(args) == 1 {
+		if m, ok := args[0].(map[string]interface{}); ok {
+			for k, v := range m {
+				b.args[k] = v
+			}
+			*target = append(*target, s)
+			return
+		}
+	}
+	xargs := len(b.args)
+	for i := 0; i < len(args); i++ {
+		k := "_arg" + strconv.Itoa(i+xargs)
+		s = strings.Replace(s, "?", "@"+k, 1)
+		b.args[k] = args[i]
+	}
+	*target = append(*target, s)
 }

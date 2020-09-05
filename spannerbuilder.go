@@ -3,11 +3,13 @@ package spannerbuilder
 type Builder struct {
 	table  string
 	sel    string
+	group  string
 	cols   []string
 	keys   []string
 	wheres []string
 	orders []string
 	joins  []string
+	having []string
 	limit  int
 	args   map[string]interface{}
 }

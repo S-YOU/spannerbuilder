@@ -38,6 +38,16 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 		s.WriteString(strings.Join(b.wheres, " AND "))
 	}
 
+	if len(b.group) > 0 {
+		s.WriteString(" GROUP BY ")
+		s.WriteString(b.group)
+	}
+
+	if len(b.having) > 0 {
+		s.WriteString(" HAVING ")
+		s.WriteString(strings.Join(b.having, " AND "))
+	}
+
 	if len(b.orders) > 0 {
 		s.WriteString(" ORDER BY ")
 		s.WriteString(strings.Join(b.orders, ", "))
