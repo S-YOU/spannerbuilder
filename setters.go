@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+func (b *Builder) From(table string) *Builder {
+	b.table = table
+	return b
+}
+
 func (b *Builder) Select(s string, cols ...string) *Builder {
 	if len(cols) == 0 {
 		b.cols = strings.Split(s, ",")
