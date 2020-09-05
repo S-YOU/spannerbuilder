@@ -48,6 +48,11 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 		s.WriteString(strings.Join(b.having, " AND "))
 	}
 
+	if len(b.sample) > 0 {
+		s.WriteString(" TABLESAMPLE ")
+		s.WriteString(b.sample)
+	}
+
 	if len(b.orders) > 0 {
 		s.WriteString(" ORDER BY ")
 		s.WriteString(strings.Join(b.orders, ", "))

@@ -37,3 +37,6 @@ spanner sql builder for select statements
 - From
     - `.From("table_name")`
     - `.From("table_name@{FORCE_INDEX=index_name}")`
+- TableSample
+    - `.TableSample("RESERVOIR (100 ROWS)")`,
+    - `.TableSample("BERNOULLI (0.1 PERCENT)")`

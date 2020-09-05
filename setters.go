@@ -45,6 +45,11 @@ func (b *Builder) Having(s string, args ...interface{}) *Builder {
 	return b
 }
 
+func (b *Builder) TableSample(s string) *Builder {
+	b.sample = s
+	return b
+}
+
 func (b *Builder) OrderBy(s string) *Builder {
 	b.orders = append(b.orders, s)
 	return b

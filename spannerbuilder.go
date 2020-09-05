@@ -4,6 +4,7 @@ type Builder struct {
 	table  string
 	sel    string
 	group  string
+	sample string
 	cols   []string
 	keys   []string
 	wheres []string
