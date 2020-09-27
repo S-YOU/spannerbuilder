@@ -29,6 +29,12 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 	s.WriteString(" FROM ")
 	s.WriteString(kwQuoted(b.table))
 
+	if len(b.index) > 0 {
+		s.WriteString("@{FORCE_INDEX=")
+		s.WriteString(b.index)
+		s.WriteByte('}')
+	}
+
 	for _, x := range b.joins {
 		s.WriteString(x)
 	}

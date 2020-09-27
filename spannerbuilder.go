@@ -5,6 +5,7 @@ type Builder struct {
 	sel    string
 	group  string
 	sample string
+	index  string
 	cols   []string
 	keys   []string
 	wheres []string
