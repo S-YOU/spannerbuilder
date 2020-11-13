@@ -36,6 +36,8 @@ spanner sql builder for select statements
                 GroupBy("group_by_expression").Having("SUM(field_name1) > @param0", map[string]interface{}{"param0": 1})`
 - Limit
     - `.Limit(20)`
+- Offset (with Limit)
+    - `.Limit(20).Offset(10)`
 - From
     - `.From("table_name")`
     - `.From("table_name@{FORCE_INDEX=index_name}")`

@@ -13,6 +13,7 @@ type Builder struct {
 	joins  []string
 	having []string
 	limit  int
+	offset int
 	args   map[string]interface{}
 }
 

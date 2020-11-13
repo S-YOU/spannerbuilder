@@ -65,6 +65,11 @@ func (b *Builder) Limit(i int) *Builder {
 	return b
 }
 
+func (b *Builder) Offset(i int) *Builder {
+	b.offset = i
+	return b
+}
+
 func (b *Builder) updateArgs(s string, args []interface{}, target *[]string) {
 	if len(args) == 1 {
 		if m, ok := args[0].(map[string]interface{}); ok {

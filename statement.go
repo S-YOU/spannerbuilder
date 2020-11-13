@@ -69,5 +69,10 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 		s.WriteString(strconv.Itoa(b.limit))
 	}
 
+	if b.offset > 0 {
+		s.WriteString(" OFFSET ")
+		s.WriteString(strconv.Itoa(b.offset))
+	}
+
 	return spanner.Statement{SQL: s.String(), Params: b.args}
 }
