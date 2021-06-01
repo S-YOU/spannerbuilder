@@ -1,5 +1,5 @@
 module github.com/s-you/spannerbuilder
 
-go 1.15
+go 1.16
 
-require cloud.google.com/go/spanner v1.9.0 // indirect
+require cloud.google.com/go/spanner v1.18.0
