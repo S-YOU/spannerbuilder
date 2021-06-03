@@ -3,9 +3,12 @@ spanner sql builder for select statements
 
 ### supported methods
 - Select
-    - `.Select("field_name")`
+    - Syntax: `.Select(statement, col1, col2, ...)`
+    - `.Select("field_name")` // special case, same as `.Select("field_name", "field_name")`
     - `.Select("DISTINCT field_name", "field_name")`
     - `.Select("COUNT(*)", "field_name")`
+    - `.Select("field_name1, field_name2", "field_name1", "field_name2")`
+    - `.Select("field_name1").Select("field_name2")` // only `field_name2` will be selected
 - Join
     - `.Join("table_name USING(field_name)")`
     - `.Join("table_name USING(field_name)", "LEFT OUTER")`

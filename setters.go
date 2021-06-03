@@ -17,8 +17,14 @@ func (b *Builder) Index(index string) *Builder {
 }
 
 func (b *Builder) Select(s string, cols ...string) *Builder {
+	// check for backward compatibility
 	if len(cols) == 0 {
-		b.cols = strings.Split(s, ",")
+		b.sel = s
+		if strings.IndexByte(s, ',') < 0 {
+			b.cols = []string{s} // simple query with one field selected `.Select("field_name")`
+		} else {
+			b.cols = []string{} // complex query, no column names will be stored in `cols` variable
+		}
 	} else {
 		b.sel = s
 		b.cols = cols
