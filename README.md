@@ -47,3 +47,6 @@ spanner sql builder for select statements
 - TableSample
     - `.TableSample("RESERVOIR (100 ROWS)")`,
     - `.TableSample("BERNOULLI (0.1 PERCENT)")`
+
+### SQL Logging
+- set `DB_DEBUG=1` to output SQL Log

@@ -1,6 +1,7 @@
 package spannerbuilder
 
 import (
+	"log"
 	"strconv"
 	"strings"
 
@@ -72,6 +73,10 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 	if b.offset > 0 {
 		s.WriteString(" OFFSET ")
 		s.WriteString(strconv.Itoa(b.offset))
+	}
+
+	if debug {
+		log.Printf("SQL: '%s', Params: %+v\n", s.String(), b.args)
 	}
 
 	return spanner.Statement{SQL: s.String(), Params: b.args}
