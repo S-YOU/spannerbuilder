@@ -1,6 +1,7 @@
 package spannerbuilder
 
 type Builder struct {
+	sql    string
 	table  string
 	sel    string
 	group  string

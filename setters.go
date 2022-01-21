@@ -16,6 +16,13 @@ func (b *Builder) Index(index string) *Builder {
 	return b
 }
 
+func (b *Builder) Statement(sql string, args ...interface{}) *Builder {
+	var target []string
+	b.updateArgs(sql, args, &target, true)
+	b.sql = target[0]
+	return b
+}
+
 func (b *Builder) Select(s string, cols ...string) *Builder {
 	// check for backward compatibility
 	if len(cols) == 0 {
@@ -42,7 +49,7 @@ func (b *Builder) Join(s string, joinType ...string) *Builder {
 }
 
 func (b *Builder) Where(s string, args ...interface{}) *Builder {
-	b.updateArgs(s, args, &b.wheres)
+	b.updateArgs(s, args, &b.wheres, false)
 	return b
 }
 
@@ -52,7 +59,7 @@ func (b *Builder) GroupBy(s string) *Builder {
 }
 
 func (b *Builder) Having(s string, args ...interface{}) *Builder {
-	b.updateArgs(s, args, &b.having)
+	b.updateArgs(s, args, &b.having, false)
 	return b
 }
 
@@ -76,7 +83,7 @@ func (b *Builder) Offset(i int) *Builder {
 	return b
 }
 
-func (b *Builder) updateArgs(s string, args []interface{}, target *[]string) {
+func (b *Builder) updateArgs(s string, args []interface{}, target *[]string, inline bool) {
 	if len(args) == 1 {
 		if m, ok := args[0].(map[string]interface{}); ok {
 			for k, v := range m {
@@ -88,8 +95,12 @@ func (b *Builder) updateArgs(s string, args []interface{}, target *[]string) {
 	}
 	xargs := len(b.args)
 	for i := 0; i < len(args); i++ {
-		k := "_arg" + strconv.Itoa(i+xargs)
+		si := strconv.Itoa(i + xargs)
+		k := "_arg" + si
 		s = strings.Replace(s, "?", "@"+k, 1)
+		if inline && strings.Contains(s, "{"+si+"}") {
+			s = strings.Replace(s, "{"+si+"}", fmt.Sprint(args[i]), -1)
+		}
 		b.args[k] = args[i]
 	}
 	*target = append(*target, s)

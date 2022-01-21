@@ -9,6 +9,13 @@ import (
 )
 
 func (b *Builder) GetSelectStatement() spanner.Statement {
+	if b.sql != "" {
+		if debug {
+			log.Printf("SQL: `%s`, Params: %+v\n", b.sql, b.args)
+		}
+		return spanner.Statement{SQL: b.sql, Params: b.args}
+	}
+
 	var s strings.Builder
 
 	s.WriteString("SELECT ")
@@ -76,7 +83,7 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 	}
 
 	if debug {
-		log.Printf("SQL: '%s', Params: %+v\n", s.String(), b.args)
+		log.Printf("SQL: `%s`, Params: %+v\n", s.String(), b.args)
 	}
 
 	return spanner.Statement{SQL: s.String(), Params: b.args}
