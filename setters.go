@@ -87,6 +87,9 @@ func (b *Builder) updateArgs(s string, args []interface{}, target *[]string, inl
 	if len(args) == 1 {
 		if m, ok := args[0].(map[string]interface{}); ok {
 			for k, v := range m {
+				if inline && strings.Contains(s, "{"+k+"}") {
+					s = strings.Replace(s, "{"+k+"}", fmt.Sprint(v), -1)
+				}
 				b.args[k] = v
 			}
 			*target = append(*target, s)

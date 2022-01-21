@@ -48,10 +48,11 @@ spanner sql builder for select statements
     - `.TableSample("RESERVOIR (100 ROWS)")`,
     - `.TableSample("BERNOULLI (0.1 PERCENT)")`
 - Statement
-    - `.Statement("SELECT * FROM users WHERE user_id = ?", "test")`,
-    - `.Statement("SELECT * FROM users WHERE user_id = '{0}'", "test")`,
-    - `.Statement("SELECT * FROM users WHERE user_id IN ({0}, {1})", 1, 2)`,
-    - `.Statement("SELECT * FROM users WHERE user_id = @userId", map[string]interface{}{"userId": "test"})`,
+    - `.Statement("SELECT * FROM users WHERE user_id = ?", "test")`
+    - `.Statement("SELECT * FROM users WHERE user_id = '{0}'", "test")`
+    - `.Statement("SELECT * FROM users WHERE user_id IN ({0}, {1})", 1, 2)`
+    - `.Statement("SELECT * FROM users WHERE user_id = @userId", map[string]interface{}{"userId": "test"})`
+    - `.Statement("SELECT * FROM users WHERE user_id = '{userId}'", map[string]interface{}{"userId": "test"})`
 
 ### SQL Logging
 - set `DB_DEBUG=1` to output SQL Log
