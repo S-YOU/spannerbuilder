@@ -11,8 +11,8 @@ spanner sql builder for select statements
     - `.Select("field_name1").Select("field_name2")` // only `field_name2` will be selected
 - Join
     - `.Join("table_name USING(field_name)")`
-    - `.Join("table_name USING(field_name)", "LEFT OUTER")`
-    - `.Join("table_name USING(field_name)", "RIGHT", "OUTER")`
+    - `.Join("table_name USING(field_name)", "LEFT")`
+    - `.Join("table_name USING(field_name)", "RIGHT OUTER")`
     - `.Join("table_name USING(field_name)").Join("table_name USING(field_name)")`
     - `.Join("table_name1@{FORCE_INDEX=index_name} ON table_name1.field_name = table_name2.field_name")`
 - Index

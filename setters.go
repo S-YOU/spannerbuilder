@@ -36,12 +36,17 @@ func (b *Builder) Select(s string, cols ...string) *Builder {
 	return b
 }
 
-func (b *Builder) Join(s string, joinType ...string) *Builder {
-	if len(joinType) == 0 {
-		b.joins = append(b.joins, fmt.Sprintf(" JOIN %s", s))
+func (b *Builder) Join(s string, args ...interface{}) *Builder {
+	var join string
+	if len(args) == 0 {
+		join = fmt.Sprintf(" INNER JOIN %s", s)
+	} else if joinType, ok := args[0].(string); ok && validJoins[joinType] {
+		join = fmt.Sprintf(" %s JOIN %s", joinType, s)
+		args = args[1:]
 	} else {
-		b.joins = append(b.joins, fmt.Sprintf(" %s JOIN %s", strings.Join(joinType, " "), s))
+		join = fmt.Sprintf(" INNER JOIN %s", s)
 	}
+	b.updateArgs(join, args, &b.joins, nil)
 	return b
 }
 

@@ -16,33 +16,22 @@ func (b *Builder) Params(args map[string]interface{}) *Builder {
 }
 
 func (b *Builder) updateArgs(s string, args []interface{}, target *[]string, whitelist map[string]bool) string {
+	start := 0
 	if len(args) == 1 {
 		if m, ok := args[0].(map[string]interface{}); ok {
 			for k, v := range m {
 				b.args[k] = v
 			}
-			found := true
-			for i := 0; i < maxNested && found; i++ {
-				found = false
-				for k, v := range b.args {
-					if b.replaceArg(&s, "{"+k+"}", v, whitelist) {
-						found = true
-					}
-				}
-			}
-			if target != nil && s != "" {
-				*target = append(*target, s)
-			}
-			return s
+			start = 1
 		}
 	}
 	xargs := len(b.args)
-	for i := 0; i < len(args); i++ {
+	for i := start; i < len(args); i++ {
 		si := strconv.Itoa(i + xargs)
 		k := "_arg" + si
 		s = strings.Replace(s, "?", "@"+k, 1)
-		b.replaceArg(&s, "{"+si+"}", args[i], whitelist)
 		b.args[k] = args[i]
+		b.replaceArg(&s, "{"+si+"}", args[i], whitelist)
 	}
 	found := true
 	for i := 0; i < maxNested && found; i++ {
