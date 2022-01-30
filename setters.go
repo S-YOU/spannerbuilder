@@ -6,8 +6,10 @@ import (
 	"strings"
 )
 
-func (b *Builder) From(table string) *Builder {
-	b.table = table
+func (b *Builder) From(table string, args ...interface{}) *Builder {
+	var target []string
+	b.updateArgs(table, args, &target, true)
+	b.table = target[0]
 	return b
 }
 

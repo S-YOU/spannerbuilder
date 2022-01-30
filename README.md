@@ -22,7 +22,7 @@ spanner sql builder for select statements
     - `.OrderBy("field_name DESC")`
 - Where
     - `.Where("field_name <op> ?", varName)`
-    - `.Where("field_name <op> @field_name", map[string]interface{}{"field_name": verName})`
+    - `.Where("field_name <op> @field_name", map[string]interface{}{"field_name": varName})`
 - GroupBy
     - `.Select("Sum(field_name1), field_name2", "field_name1", "field_name2").
             GroupBy("group_by_expression")`
@@ -44,6 +44,7 @@ spanner sql builder for select statements
 - From
     - `.From("table_name")`
     - `.From("table_name@{FORCE_INDEX=index_name}")`
+    - `.From("UNNEST(GENERATE_ARRAY(0, @fieldName)) AS field_name", map[string]interface{}{"fieldName": varName})`
 - TableSample
     - `.TableSample("RESERVOIR (100 ROWS)")`,
     - `.TableSample("BERNOULLI (0.1 PERCENT)")`
