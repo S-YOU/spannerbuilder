@@ -22,7 +22,7 @@ spanner sql builder for select statements
     - `.OrderBy("field_name DESC")`
 - Where
     - `.Where("field_name <op> ?", varName)`
-    - `.Where("field_name <op> @field_name", map[string]interface{}{"field_name": varName})`
+    - `.Where("field_name <op> @field_name", M{"field_name": varName})`
 - GroupBy
     - `.Select("Sum(field_name1), field_name2", "field_name1", "field_name2").
             GroupBy("group_by_expression")`
@@ -32,11 +32,11 @@ spanner sql builder for select statements
     - `.Select("Sum(field_name1), field_name2", "field_name1", "field_name2").
             GroupBy("group_by_expression").Having("SUM(field_name1) > ?", 1)`
     - `.Select("Sum(field_name1), field_name2", "field_name1", "field_name2").
-            GroupBy("group_by_expression").Having("SUM(field_name1) > @param0", map[string]interface{}{"param0": 1})`
+            GroupBy("group_by_expression").Having("SUM(field_name1) > @param0", M{"param0": 1})`
     - Having (with GroupBy, Select, Where)
         - `.Select("Sum(field_name1), field_name2", "field_name1", "field_name2").
                 Where("field_name2 == ?", "something").
-                GroupBy("group_by_expression").Having("SUM(field_name1) > @param0", map[string]interface{}{"param0": 1})`
+                GroupBy("group_by_expression").Having("SUM(field_name1) > @param0", M{"param0": 1})`
 - Limit
     - `.Limit(20)`
 - Offset (with Limit)
@@ -44,7 +44,7 @@ spanner sql builder for select statements
 - From
     - `.From("table_name")`
     - `.From("table_name@{FORCE_INDEX=index_name}")`
-    - `.From("UNNEST(GENERATE_ARRAY(0, @fieldName)) AS field_name", map[string]interface{}{"fieldName": varName})`
+    - `.From("UNNEST(GENERATE_ARRAY(0, @fieldName)) AS field_name", M{"fieldName": varName})`
 - TableSample
     - `.TableSample("RESERVOIR (100 ROWS)")`,
     - `.TableSample("BERNOULLI (0.1 PERCENT)")`
@@ -52,8 +52,12 @@ spanner sql builder for select statements
     - `.Statement("SELECT * FROM users WHERE user_id = ?", "test")`
     - `.Statement("SELECT * FROM users WHERE user_id = '{0}'", "test")`
     - `.Statement("SELECT * FROM users WHERE user_id IN ({0}, {1})", 1, 2)`
-    - `.Statement("SELECT * FROM users WHERE user_id = @userId", map[string]interface{}{"userId": "test"})`
-    - `.Statement("SELECT * FROM users WHERE user_id = '{userId}'", map[string]interface{}{"userId": "test"})`
+    - `.Statement("SELECT * FROM users WHERE user_id = @userId", M{"userId": "test"})`
+    - `.Statement("SELECT * FROM users WHERE user_id = '{userId}'", M{"userId": "test"})`
+- SubQuery
+  - `XX(M{"subQuery": YY()}).From("({subQuery})")`
+- Union
+    - `XX.From("users").Union(YY.From("admins"))`
 
 ### SQL Logging
 - set `DB_DEBUG=1` to output SQL Log
