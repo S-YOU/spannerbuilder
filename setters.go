@@ -2,14 +2,13 @@ package spannerbuilder
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
-func (b *Builder) From(table string, args ...interface{}) *Builder {
-	var target []string
-	b.updateArgs(table, args, &target, true)
-	b.table = target[0]
+func (b *Builder) From(s string, args ...interface{}) *Builder {
+	if s != "" {
+		b.updateArgs(s, args, &b.froms, nil)
+	}
 	return b
 }
 
@@ -19,9 +18,7 @@ func (b *Builder) Index(index string) *Builder {
 }
 
 func (b *Builder) Statement(sql string, args ...interface{}) *Builder {
-	var target []string
-	b.updateArgs(sql, args, &target, true)
-	b.sql = target[0]
+	b.sql = b.updateArgs(sql, args, nil, nil)
 	return b
 }
 
@@ -39,17 +36,24 @@ func (b *Builder) Select(s string, cols ...string) *Builder {
 	return b
 }
 
-func (b *Builder) Join(s string, joinType ...string) *Builder {
-	if len(joinType) == 0 {
-		b.joins = append(b.joins, fmt.Sprintf(" JOIN %s", s))
+func (b *Builder) Join(s string, args ...interface{}) *Builder {
+	var join string
+	if len(args) == 0 {
+		join = fmt.Sprintf(" INNER JOIN %s", s)
+	} else if joinType, ok := args[0].(string); ok && validJoins[joinType] {
+		join = fmt.Sprintf(" %s JOIN %s", joinType, s)
+		args = args[1:]
 	} else {
-		b.joins = append(b.joins, fmt.Sprintf(" %s JOIN %s", strings.Join(joinType, " "), s))
+		join = fmt.Sprintf(" INNER JOIN %s", s)
 	}
+	b.updateArgs(join, args, &b.joins, nil)
 	return b
 }
 
 func (b *Builder) Where(s string, args ...interface{}) *Builder {
-	b.updateArgs(s, args, &b.wheres, false)
+	if s != "" {
+		b.updateArgs(s, args, &b.wheres, defaultWhiteList)
+	}
 	return b
 }
 
@@ -59,7 +63,9 @@ func (b *Builder) GroupBy(s string) *Builder {
 }
 
 func (b *Builder) Having(s string, args ...interface{}) *Builder {
-	b.updateArgs(s, args, &b.having, false)
+	if s != "" {
+		b.updateArgs(s, args, &b.having, defaultWhiteList)
+	}
 	return b
 }
 
@@ -68,43 +74,41 @@ func (b *Builder) TableSample(s string) *Builder {
 	return b
 }
 
-func (b *Builder) OrderBy(s string) *Builder {
-	b.orders = append(b.orders, s)
+func (b *Builder) OrderBy(s string, args ...interface{}) *Builder {
+	if s != "" {
+		if len(b.unions) > 0 {
+			b.updateArgs(s, args, &b.uOdrs, defaultWhiteList)
+		} else {
+			b.updateArgs(s, args, &b.orders, defaultWhiteList)
+		}
+	}
 	return b
 }
 
 func (b *Builder) Limit(i int) *Builder {
-	b.limit = i
+	if len(b.unions) > 0 {
+		b.uLim = i
+	} else {
+		b.limit = i
+	}
 	return b
 }
 
 func (b *Builder) Offset(i int) *Builder {
-	b.offset = i
+	if len(b.unions) > 0 {
+		b.uOfs = i
+	} else {
+		b.offset = i
+	}
 	return b
 }
 
-func (b *Builder) updateArgs(s string, args []interface{}, target *[]string, inline bool) {
-	if len(args) == 1 {
-		if m, ok := args[0].(map[string]interface{}); ok {
-			for k, v := range m {
-				if inline && strings.Contains(s, "{"+k+"}") {
-					s = strings.Replace(s, "{"+k+"}", fmt.Sprint(v), -1)
-				}
-				b.args[k] = v
-			}
-			*target = append(*target, s)
-			return
-		}
+func (b *Builder) Union(sel Selector, unionType ...string) *Builder {
+	sql := sel.GetSelectStatement().SQL
+	if len(unionType) == 0 {
+		b.unions = append(b.unions, fmt.Sprintf("UNION ALL\n(%s)", sql))
+	} else {
+		b.unions = append(b.unions, fmt.Sprintf("UNION %s\n(%s)", unionType[0], sql))
 	}
-	xargs := len(b.args)
-	for i := 0; i < len(args); i++ {
-		si := strconv.Itoa(i + xargs)
-		k := "_arg" + si
-		s = strings.Replace(s, "?", "@"+k, 1)
-		if inline && strings.Contains(s, "{"+si+"}") {
-			s = strings.Replace(s, "{"+si+"}", fmt.Sprint(args[i]), -1)
-		}
-		b.args[k] = args[i]
-	}
-	*target = append(*target, s)
+	return b
 }
