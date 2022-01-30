@@ -8,6 +8,10 @@ import (
 	"cloud.google.com/go/spanner"
 )
 
+type Selector interface {
+	GetSelectStatement() spanner.Statement
+}
+
 func (b *Builder) GetSelectStatement() spanner.Statement {
 	if b.sql != "" {
 		if debug {
@@ -18,8 +22,12 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 
 	var s strings.Builder
 
+	if len(b.unions) > 0 {
+		s.WriteByte('(')
+	}
+
 	s.WriteString("SELECT ")
-	if b.sel == "" {
+	if len(b.sels) == 0 {
 		for i, x := range b.cols {
 			if i > 0 {
 				s.WriteByte(',')
@@ -31,11 +39,20 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 			}
 		}
 	} else {
-		s.WriteString(b.sel)
+		for i, x := range b.sels {
+			if i > 0 {
+				s.WriteByte(',')
+			}
+			s.WriteString(kwQuoted(x))
+		}
 	}
 
 	s.WriteString(" FROM ")
-	s.WriteString(kwQuoted(b.table))
+	if len(b.froms) > 0 {
+		s.WriteString(strings.Join(b.froms, ", "))
+	} else {
+		s.WriteString(kwQuoted(b.table))
+	}
 
 	if len(b.index) > 0 {
 		s.WriteString("@{FORCE_INDEX=")
@@ -82,9 +99,35 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 		s.WriteString(strconv.Itoa(b.offset))
 	}
 
+	if len(b.unions) > 0 {
+		s.WriteByte(')')
+		s.WriteByte('\n')
+		s.WriteString(strings.Join(b.unions, "\n"))
+
+		if len(b.uOdrs) > 0 {
+			s.WriteString(" ORDER BY ")
+			s.WriteString(strings.Join(b.uOdrs, ", "))
+		}
+
+		if b.uLim > 0 {
+			s.WriteString(" LIMIT ")
+			s.WriteString(strconv.Itoa(b.uLim))
+		}
+
+		if b.uOfs > 0 {
+			s.WriteString(" OFFSET ")
+			s.WriteString(strconv.Itoa(b.uOfs))
+		}
+	}
+
 	if debug {
 		log.Printf("SQL: `%s`, Params: %+v\n", s.String(), b.args)
 	}
 
 	return spanner.Statement{SQL: s.String(), Params: b.args}
+}
+
+func (b *Builder) String() string {
+	stmt := b.GetSelectStatement()
+	return stmt.SQL
 }
