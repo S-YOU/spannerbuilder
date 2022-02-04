@@ -21,6 +21,8 @@ type Builder struct {
 	uOfs   int
 	uOdrs  []string
 	args   map[string]interface{}
+	tblMap map[string][]string
+	fldMap map[string][]string
 }
 
 func NewSpannerBuilder(table string, cols, keys []string, args ...map[string]interface{}) *Builder {
@@ -31,9 +33,10 @@ func NewSpannerBuilder(table string, cols, keys []string, args ...map[string]int
 		}
 	}
 	return &Builder{
-		table: table,
-		cols:  cols,
-		keys:  keys,
-		args:  bArgs,
+		table:  table,
+		cols:   cols,
+		keys:   keys,
+		args:   bArgs,
+		fldMap: make(map[string][]string),
 	}
 }

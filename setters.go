@@ -8,6 +8,7 @@ import (
 
 func (b *Builder) From(s string, args ...interface{}) *Builder {
 	if s != "" {
+		b.buildFromFieldMap(s)
 		b.updateArgs(s, args, &b.froms, defaultWhiteList)
 	}
 	return b
@@ -43,6 +44,7 @@ func (b *Builder) Join(s string, args ...interface{}) *Builder {
 	} else {
 		join = fmt.Sprintf(" INNER JOIN %s", s)
 	}
+	b.buildJoinFieldMap(join)
 	b.updateArgs(join, args, &b.joins, defaultWhiteList)
 	return b
 }

@@ -43,6 +43,7 @@ func (b *Builder) GetSelectStatement() spanner.Statement {
 			if i > 0 {
 				s.WriteByte(',')
 			}
+			b.expandAsterisk(&x)
 			s.WriteString(kwQuoted(x))
 		}
 	}
