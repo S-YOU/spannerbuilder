@@ -15,17 +15,23 @@ func (b *Builder) From(s string, args ...interface{}) *Builder {
 }
 
 func (b *Builder) Index(index string) *Builder {
-	b.index = index
+	if index != "" {
+		b.index = index
+	}
 	return b
 }
 
 func (b *Builder) Statement(sql string, args ...interface{}) *Builder {
-	b.sql = b.updateArgs(sql, args, nil, nil)
+	if sql != "" {
+		b.sql = b.updateArgs(sql, args, nil, nil)
+	}
 	return b
 }
 
 func (b *Builder) Select(s string, args ...interface{}) *Builder {
-	b.updateArgs(s, args, &b.sels, defaultWhiteList)
+	if s != "" {
+		b.updateArgs(s, args, &b.sels, defaultWhiteList)
+	}
 	return b
 }
 
@@ -35,17 +41,19 @@ func (b *Builder) SetColumns(cols ...string) *Builder {
 }
 
 func (b *Builder) Join(s string, args ...interface{}) *Builder {
-	var join string
-	if len(args) == 0 {
-		join = fmt.Sprintf(" INNER JOIN %s", s)
-	} else if joinType, ok := args[0].(string); ok && validJoins[joinType] {
-		join = fmt.Sprintf(" %s JOIN %s", joinType, s)
-		args = args[1:]
-	} else {
-		join = fmt.Sprintf(" INNER JOIN %s", s)
+	if s != "" {
+		var join string
+		if len(args) == 0 {
+			join = fmt.Sprintf(" INNER JOIN %s", s)
+		} else if joinType, ok := args[0].(string); ok && validJoins[joinType] {
+			join = fmt.Sprintf(" %s JOIN %s", joinType, s)
+			args = args[1:]
+		} else {
+			join = fmt.Sprintf(" INNER JOIN %s", s)
+		}
+		b.buildJoinFieldMap(join)
+		b.updateArgs(join, args, &b.joins, defaultWhiteList)
 	}
-	b.buildJoinFieldMap(join)
-	b.updateArgs(join, args, &b.joins, defaultWhiteList)
 	return b
 }
 
@@ -64,7 +72,9 @@ func (b *Builder) WhereIf(cond bool, s string, args ...interface{}) *Builder {
 }
 
 func (b *Builder) GroupBy(s string) *Builder {
-	b.group = s
+	if s != "" {
+		b.group = s
+	}
 	return b
 }
 
@@ -76,7 +86,9 @@ func (b *Builder) Having(s string, args ...interface{}) *Builder {
 }
 
 func (b *Builder) TableSample(s string) *Builder {
-	b.sample = s
+	if s != "" {
+		b.sample = s
+	}
 	return b
 }
 
