@@ -8,6 +8,18 @@ import (
 )
 
 func GetInsertSQL(table string, cols, keys []string, values []interface{}) spanner.Statement {
+	return getInsertOrSQL("", table, cols, keys, values)
+}
+
+func GetInsertOrUpdateSQL(table string, cols, keys []string, values []interface{}) spanner.Statement {
+	return getInsertOrSQL("OR UPDATE INTO ", table, cols, keys, values)
+}
+
+func GetInsertOrIgnoreSQL(table string, cols, keys []string, values []interface{}) spanner.Statement {
+	return getInsertOrSQL("OR IGNORE INTO ", table, cols, keys, values)
+}
+
+func getInsertOrSQL(orType string, table string, cols, keys []string, values []interface{}) spanner.Statement {
 	setColumns := make([]string, 0, len(cols)-len(keys))
 	for _, c := range cols {
 		if stringSliceContains(keys, c) {
@@ -16,7 +28,7 @@ func GetInsertSQL(table string, cols, keys []string, values []interface{}) spann
 		setColumns = append(setColumns, c+" = @"+c)
 	}
 
-	sql := `INSERT ` + kwQuoted(table) + ` (` + strings.Join(cols, ", ") + `) VALUES (@` + strings.Join(cols, ", @") + ")"
+	sql := "INSERT " + orType + kwQuoted(table) + ` (` + strings.Join(cols, ", ") + `) VALUES (@` + strings.Join(cols, ", @") + ")"
 	stmt := spanner.NewStatement(sql)
 	for i, col := range cols {
 		stmt.Params[col] = values[i]
